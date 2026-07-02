@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Inventario Azul Web</title>
+  <style>
+    :root {
+      --blue: #0b4ea2;
+      --blue-dark: #063478;
+      --blue-soft: #d2e7ff;
+      --blue-light: #eaf3ff;
+      --ink: #121f30;
+      --muted: #5c6f84;
+      --border: #aacbeb;
+      --red: #be1e2d;
+      --white: #ffffff;
+      --shadow: 0 8px 22px rgba(11, 78, 162, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--blue-light);
+      color: var(--ink);
+    }
+
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 18px 14px 40px;
+    }
+
+    .header {
+      margin-bottom: 12px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 2px 0;
+      font-size: 30px;
+      line-height: 1.05;
+    }
+
+    .subtitle {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1px solid #bfd9f3;
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+    }
+
+    .section {
+      margin: 14px 0 8px;
+      color: var(--blue);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .section:first-child {
+      margin-top: 0;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 680px) {
+      .row.two {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--blue-dark);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--ink);
+      font: inherit;
+      font-size: 16px;
+      padding: 12px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 76px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(11, 78, 162, .12);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    button {
+      min-height: 50px;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .secondary {
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .danger {
+      background: var(--red);
+      color: #fff;
+    }
+
+    .camera-box {
+      display: none;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #000;
+      border: 1px solid var(--border);
+      margin-top: 10px;
+    }
+
+    .camera-box.active {
+      display: block;
+    }
+
+    video {
+      width: 100%;
+      max-height: 350px;
+      display: block;
+      object-fit: cover;
+      background: #000;
+    }
+
+    .camera-note {
+      margin: 0;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stats {
+      color: var(--ink);
+      font-size: 19px;
+      font-weight: 900;
+      margin: 0 0 10px;
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 22px 8px;
+      font-size: 15px;
+    }
+
+    .product {
+      border: 1px solid #d7e8f8;
+      border-radius: 14px;
+      padding: 12px;
+      margin: 8px 0;
+      background: #fff;
+    }
+
+    .product strong {
+      display: block;
+      font-size: 17px;
+      margin-bottom: 4px;
+      overflow-wrap: anywhere;
+    }
+
+    .product p {
+      margin: 3px 0;
+      color: var(--muted);
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .product-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .small-btn {
+      min-height: 42px;
+      font-size: 14px;
+      padding: 9px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 999px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: .2s ease;
+      z-index: 999;
+      max-width: calc(100% - 28px);
+      text-align: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    .note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <p class="eyebrow">Inventario remoto</p>
+      <h1>Inventario Azul</h1>
+      <p class="subtitle">Escanea, registra y exporta productos para tu punto de venta.</p>
+    </header>
+
+    <section class="card">
+      <div class="actions">
+        <button class="primary" id="scanBtn">Escanear código</button>
+        <button class="secondary" id="clearBtn">Limpiar</button>
+      </div>
+
+      <div class="camera-box" id="cameraBox">
+        <video id="video" playsinline muted></video>
+        <p class="camera-note" id="cameraNote">Apunta la cámara al código de barras.</p>
+      </div>
+    </section>
+
+    <section class="card">
+      <p class="section">Registro del producto</p>
+
+      <div class="row">
+        <div>
+          <label for="barcode">Código de barras</label>
+          <input id="barcode" type="text" inputmode="numeric" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="7503027753629" />
+        </div>
+
+        <div>
+          <label for="name">Nombre del producto *</label>
+          <input id="name" type="text" autocomplete="off" placeholder="Nombre del producto" />
+        </div>
+      </div>
+
+      <div class="row two" style="margin-top:10px;">
+        <div>
+          <label for="category">Categoría</label>
+          <input id="category" type="text" autocomplete="off" placeholder="Categoría" />
+        </div>
+        <div>
+          <label for="brand">Marca</label>
+          <input id="brand" type="text" autocomplete="off" placeholder="Marca" />
+        </div>
+      </div>
+
+      <div class="row two" style="margin-top:10px;">
+        <div>
+          <label for="stock">Cantidad inventario</label>
+          <input id="stock" type="text" inputmode="decimal" value="1" />
+        </div>
+        <div>
+          <label for="stockUnit">Unidad</label>
+          <select id="stockUnit">
+            <option>Pieza</option>
+            <option>Caja</option>
+            <option>Paquete</option>
+            <option>Bolsa</option>
+            <option>Kg</option>
+            <option>Litro</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="section">Contenido opcional</p>
+
+      <div class="row two">
+        <div>
+          <label for="contentType">Tipo</label>
+          <select id="contentType">
+            <option>Sin dato</option>
+            <option>Alimento</option>
+            <option>Líquido</option>
+          </select>
+        </div>
+        <div>
+          <label for="contentUnit">Medida</label>
+          <select id="contentUnit">
+            <option value=""></option>
+            <option>g</option>
+            <option>kg</option>
+            <option>ml</option>
+            <option>l</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label for="contentAmount">Gramos, kg, ml o litros</label>
+        <input id="contentAmount" type="text" inputmode="decimal" placeholder="Cantidad de contenido" />
+      </div>
+
+      <p class="section">Datos para POS</p>
+
+      <div class="row two">
+        <div>
+          <label for="cost">Costo</label>
+          <input id="cost" type="text" inputmode="decimal" placeholder="Costo" />
+        </div>
+        <div>
+          <label for="price">Precio sugerido</label>
+          <input id="price" type="text" inputmode="decimal" placeholder="Precio sugerido" />
+        </div>
+      </div>
+
+      <div class="row two" style="margin-top:10px;">
+        <div>
+          <label for="supplier">Proveedor</label>
+          <input id="supplier" type="text" autocomplete="off" placeholder="Proveedor" />
+        </div>
+        <div>
+          <label for="location">Ubicación</label>
+          <input id="location" type="text" autocomplete="off" placeholder="Ubicación" />
+        </div>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label for="notes">Notas</label>
+        <textarea id="notes" placeholder="Notas"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="primary" id="saveBtn">Guardar</button>
+        <button class="secondary" id="saveCsvBtn">Guardar CSV</button>
+      </div>
+
+      <div class="actions" style="margin-top:0;">
+        <button class="secondary" id="shareCsvBtn">Compartir CSV</button>
+      </div>
+
+      <p class="note">El código de barras se exporta como texto para que Excel no lo convierta a notación científica.</p>
+    </section>
+
+    <section class="card">
+      <p class="section">Lista actual</p>
+      <p class="stats" id="statsText">0 productos | 0 unidades</p>
+      <div id="productList"></div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "inventario_azul_simple_web";
+    let products = [];
+    let editingId = null;
+    let stream = null;
+    let detector = null;
+    let scanning = false;
+    let scanTimer = null;
+
+    const $ = (id) => document.getElementById(id);
+
+    const fields = {
+      barcode: $("barcode"),
+      name: $("name"),
+      category: $("category"),
+      brand: $("brand"),
+      stock: $("stock"),
+      stockUnit: $("stockUnit"),
+      contentType: $("contentType"),
+      contentAmount: $("contentAmount"),
+      contentUnit: $("contentUnit"),
+      cost: $("cost"),
+      price: $("price"),
+      supplier: $("supplier"),
+      location: $("location"),
+      notes: $("notes")
+    };
+
+    function uid() {
+      if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+      return "id_" + Date.now() + "_" + Math.random().toString(16).slice(2);
+    }
+
+    function clean(value) {
+      return String(value || "").trim();
+    }
+
+    function numberValue(value) {
+      const n = parseFloat(clean(value).replace(",", "."));
+      return Number.isFinite(n) ? n : 0;
+    }
+
+    function formatNumber(value) {
+      if (Math.floor(value) === value) return String(value);
+      return value.toFixed(3).replace(/0+$/, "").replace(/\.$/, "");
+    }
+
+    function toast(message) {
+      const el = $("toast");
+      el.textContent = message;
+      el.classList.add("show");
+      clearTimeout(el.timer);
+      el.timer = setTimeout(() => el.classList.remove("show"), 2200);
+    }
+
+    function loadProducts() {
+      try {
+        products = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+        if (!Array.isArray(products)) products = [];
+      } catch {
+        products = [];
+      }
+    }
+
+    function saveProducts() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+    }
+
+    function productFromForm() {
+      return {
+        id: editingId || uid(),
+        barcode: clean(fields.barcode.value),
+        name: clean(fields.name.value),
+        category: clean(fields.category.value),
+        brand: clean(fields.brand.value),
+        stock: clean(fields.stock.value) || "0",
+        stockUnit: clean(fields.stockUnit.value) || "Pieza",
+        contentType: clean(fields.contentType.value) || "Sin dato",
+        contentAmount: clean(fields.contentAmount.value),
+        contentUnit: clean(fields.contentUnit.value),
+        cost: clean(fields.cost.value),
+        price: clean(fields.price.value),
+        supplier: clean(fields.supplier.value),
+        location: clean(fields.location.value),
+        notes: clean(fields.notes.value),
+        updatedAt: Date.now()
+      };
+    }
+
+    function saveProduct() {
+      const product = productFromForm();
+
+      if (!product.name) {
+        toast("Escribe el nombre del producto");
+        fields.name.focus();
+        return;
+      }
+
+      const duplicate = products.find(p => p.barcode && p.barcode === product.barcode && p.id !== product.id);
+
+      if (duplicate) {
+        product.id = duplicate.id;
+        products = products.filter(p => p.id !== duplicate.id);
+      } else {
+        products = products.filter(p => p.id !== product.id);
+      }
+
+      products.unshift(product);
+      saveProducts();
+      clearForm();
+      renderProducts();
+      toast("Producto guardado");
+    }
+
+    function clearForm() {
+      editingId = null;
+      fields.barcode.value = "";
+      fields.name.value = "";
+      fields.category.value = "";
+      fields.brand.value = "";
+      fields.stock.value = "1";
+      fields.stockUnit.value = "Pieza";
+      fields.contentType.value = "Sin dato";
+      fields.contentAmount.value = "";
+      fields.contentUnit.value = "";
+      fields.cost.value = "";
+      fields.price.value = "";
+      fields.supplier.value = "";
+      fields.location.value = "";
+      fields.notes.value = "";
+    }
+
+    function fillForm(product) {
+      editingId = product.id;
+      fields.barcode.value = product.barcode || "";
+      fields.name.value = product.name || "";
+      fields.category.value = product.category || "";
+      fields.brand.value = product.brand || "";
+      fields.stock.value = product.stock || "0";
+      fields.stockUnit.value = product.stockUnit || "Pieza";
+      fields.contentType.value = product.contentType || "Sin dato";
+      fields.contentAmount.value = product.contentAmount || "";
+      fields.contentUnit.value = product.contentUnit || "";
+      fields.cost.value = product.cost || "";
+      fields.price.value = product.price || "";
+      fields.supplier.value = product.supplier || "";
+      fields.location.value = product.location || "";
+      fields.notes.value = product.notes || "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      toast("Producto listo para editar");
+    }
+
+    function deleteProduct(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+      if (!confirm('¿Eliminar "' + product.name + '"?')) return;
+      products = products.filter(p => p.id !== id);
+      saveProducts();
+      renderProducts();
+      toast("Producto eliminado");
+    }
+
+    function contentLabel(product) {
+      if (!product.contentType || product.contentType === "Sin dato" || !clean(product.contentAmount)) return "Sin dato";
+      return clean(product.contentAmount) + " " + clean(product.contentUnit);
+    }
+
+    function renderProducts() {
+      const list = $("productList");
+      list.innerHTML = "";
+
+      const units = products.reduce((sum, p) => sum + numberValue(p.stock), 0);
+      $("statsText").textContent = products.length + " productos | " + formatNumber(units) + " unidades";
+
+      if (!products.length) {
+        list.innerHTML = '<div class="empty">Aún no hay productos. Escanea o escribe el primer código.</div>';
+        return;
+      }
+
+      products.forEach(product => {
+        const item = document.createElement("div");
+        item.className = "product";
+        item.innerHTML = `
+          <strong>${escapeHtml(product.name)}</strong>
+          <p>${escapeHtml(product.barcode || "Sin código")} | ${escapeHtml(product.stock)} ${escapeHtml(product.stockUnit)} | ${escapeHtml(contentLabel(product))}</p>
+          <p>${escapeHtml([product.category, product.brand, product.price ? "$" + product.price : ""].filter(Boolean).join(" | "))}</p>
+          <div class="product-actions">
+            <button class="secondary small-btn" data-edit="${product.id}">Editar</button>
+            <button class="danger small-btn" data-delete="${product.id}">Eliminar</button>
+          </div>
+        `;
+        list.appendChild(item);
+      });
+
+      list.querySelectorAll("[data-edit]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const product = products.find(p => p.id === btn.dataset.edit);
+          if (product) fillForm(product);
+        });
+      });
+
+      list.querySelectorAll("[data-delete]").forEach(btn => {
+        btn.addEventListener("click", () => deleteProduct(btn.dataset.delete));
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function csvCell(value) {
+      return '"' + String(value || "").replaceAll('"', '""') + '"';
+    }
+
+    function excelTextCell(value) {
+      const safe = String(value || "").replaceAll('"', '""');
+      if (!safe.trim()) return '""';
+      return '="' + safe + '"';
+    }
+
+    function csvContent() {
+      const headers = [
+        "codigo_barras",
+        "producto",
+        "categoria",
+        "marca",
+        "cantidad_inventario",
+        "unidad_inventario",
+        "tipo_contenido",
+        "contenido_cantidad",
+        "contenido_unidad",
+        "costo",
+        "precio_sugerido",
+        "proveedor",
+        "ubicacion",
+        "notas"
+      ];
+
+      const rows = [];
+      rows.push(headers.map(csvCell).join(","));
+
+      products.forEach(p => {
+        const values = [
+          p.barcode,
+          p.name,
+          p.category,
+          p.brand,
+          p.stock,
+          p.stockUnit,
+          p.contentType === "Sin dato" ? "" : p.contentType,
+          p.contentAmount,
+          p.contentUnit,
+          p.cost,
+          p.price,
+          p.supplier,
+          p.location,
+          p.notes
+        ];
+
+        const row = values.map((value, index) => {
+          if (index === 0) return excelTextCell(value);
+          return csvCell(value);
+        });
+
+        rows.push(row.join(","));
+      });
+
+      return "\uFEFF" + rows.join("\n");
+    }
+
+    function fileName() {
+      const d = new Date();
+      const stamp =
+        d.getFullYear() +
+        String(d.getMonth() + 1).padStart(2, "0") +
+        String(d.getDate()).padStart(2, "0") +
+        "_" +
+        String(d.getHours()).padStart(2, "0") +
+        String(d.getMinutes()).padStart(2, "0");
+      return "inventario_pos_" + stamp + ".csv";
+    }
+
+    function makeCsvFile() {
+      return new File([csvContent()], fileName(), { type: "text/csv;charset=utf-8" });
+    }
+
+    function saveCsv() {
+      if (!products.length) {
+        toast("Agrega productos antes de exportar");
+        return;
+      }
+
+      const blob = new Blob([csvContent()], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast("CSV guardado");
+    }
+
+    async function shareCsv() {
+      if (!products.length) {
+        toast("Agrega productos antes de compartir");
+        return;
+      }
+
+      const file = makeCsvFile();
+
+      if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+        try {
+          await navigator.share({
+            title: "Inventario POS",
+            text: "Archivo CSV de inventario",
+            files: [file]
+          });
+          toast("CSV compartido");
+        } catch {
+          toast("No se compartió el CSV");
+        }
+      } else {
+        saveCsv();
+        toast("Tu navegador descargó el CSV");
+      }
+    }
+
+    async function startScanner() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        toast("Este navegador no permite cámara aquí");
+        return;
+      }
+
+      if (!("BarcodeDetector" in window)) {
+        toast("Escaneo no compatible. Escribe el código manualmente.");
+        return;
+      }
+
+      try {
+        try {
+          detector = new BarcodeDetector({
+            formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128", "code_39", "itf"]
+          });
+        } catch {
+          detector = new BarcodeDetector();
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" }
+          },
+          audio: false
+        });
+
+        const video = $("video");
+        video.srcObject = stream;
+        await video.play();
+
+        $("cameraBox").classList.add("active");
+        $("cameraNote").textContent = "Buscando código...";
+        scanning = true;
+        scanLoop();
+      } catch {
+        toast("No se pudo abrir la cámara");
+      }
+    }
+
+    async function scanLoop() {
+      if (!scanning || !detector) return;
+
+      try {
+        const codes = await detector.detect($("video"));
+
+        if (codes && codes.length && codes[0].rawValue) {
+          const code = clean(codes[0].rawValue);
+          fields.barcode.value = code;
+          stopScanner();
+
+          const existing = products.find(p => p.barcode === code);
+          if (existing) {
+            fillForm(existing);
+            toast("Código encontrado");
+          } else {
+            fields.name.focus();
+            toast("Código capturado");
+          }
+          return;
+        }
+      } catch {}
+
+      scanTimer = setTimeout(scanLoop, 300);
+    }
+
+    function stopScanner() {
+      scanning = false;
+      clearTimeout(scanTimer);
+
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+
+      $("video").srcObject = null;
+      $("cameraBox").classList.remove("active");
+    }
+
+    fields.contentType.addEventListener("change", () => {
+      const value = fields.contentType.value;
+      if (value === "Alimento") {
+        fields.contentUnit.value = "g";
+      } else if (value === "Líquido") {
+        fields.contentUnit.value = "ml";
+      } else {
+        fields.contentAmount.value = "";
+        fields.contentUnit.value = "";
+      }
+    });
+
+    $("scanBtn").addEventListener("click", startScanner);
+    $("clearBtn").addEventListener("click", () => {
+      stopScanner();
+      clearForm();
+    });
+    $("saveBtn").addEventListener("click", saveProduct);
+    $("saveCsvBtn").addEventListener("click", saveCsv);
+    $("shareCsvBtn").addEventListener("click", shareCsv);
+    window.addEventListener("beforeunload", stopScanner);
+
+    loadProducts();
+    renderProducts();
+  </script>
+</body>
+</html>
